@@ -1,5 +1,7 @@
+import os
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 
 from sklearn import svm
 from sklearn import tree
@@ -9,8 +11,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
+from keras.models import Sequential
+from keras.layers.core import Dense, Activation, Dropout
+
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_predict
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 df = pd.concat([
     pd.read_excel('data/matches/2017.xlsx'),
@@ -100,3 +107,51 @@ for name, model in models.items():
     report = classification_report(y_test, y_pred)
     print(name)
     print(report, end='\n\n')
+
+# let's try something deeper, just for fun
+y_train_DL = []
+for label in y_train:
+    if label == 0:
+        y_train_DL.append([1, 0])
+    else:
+        y_train_DL.append([0, 1])
+
+model = Sequential()
+model.add(Dense(128, input_dim=X.shape[1]))
+model.add(Activation('relu'))
+model.add(Dropout(0.2))
+model.add(Dense(128))
+model.add(Activation('relu'))
+model.add(Dropout(0.2))
+model.add(Dense(64))
+model.add(Activation('relu'))
+model.add(Dropout(0.1))
+model.add(Dense(2))
+model.add(Activation('softmax'))
+
+model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+model.fit(
+    X_train.as_matrix(), y_train_DL,
+    epochs=20,
+    batch_size=32,
+    validation_split=0.1,
+    verbose=0
+)
+preds = model.predict_classes(X_test.as_matrix(), verbose=0)
+report = classification_report(y_test, preds)
+print('Deep NN (cross entropy + rmsprop)')
+print(report, end='\n\n')
+
+model.reset_states() 
+model.compile(loss='mean_squared_error', optimizer='sgd')
+model.fit(
+    X_train.as_matrix(), y_train_DL,
+    epochs=20,
+    batch_size=32,
+    validation_split=0.1,
+    verbose=0
+)
+preds = model.predict_classes(X_test.as_matrix(), verbose=0)
+report = classification_report(y_test, preds)
+print('Deep NN (mean squared error + sgd)')
+print(report, end='\n\n')
