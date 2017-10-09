@@ -9,4 +9,6 @@ So far there is just a small study to predict a hypothetical Djokovic vs. Nadal 
 
 - `mlp_comparison.py`: same as `clf_comparison.py`, but comparing multiple MLPs configs up to 4 hidden layers.
 
-- `tennis_p2p.ipynb`: another IPython notebook with a brief dataset exploration on the point to point dataset
+- `tennis_p2p.ipynb`: another IPython notebook with a brief dataset exploration on the point to point dataset.
+
+- `tennis_simulation.ipynb`: a notebook exploring the possibility of modeling a tennis game as a stochastic simulation; the dataset is the same used in the `tennis_p2p.ipynb` notebook. WIP.
