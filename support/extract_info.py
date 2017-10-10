@@ -11,6 +11,9 @@ df = pd.concat([
     pd.read_excel('../data/matches/2013.xlsx')
 ], axis = 0)
 
+df_ratio = pd.read_csv('../data/surface_ratio.csv', delimiter=', ')
+df_service = pd.read_csv('../data/avg_service_speed.csv', delimiter=', ')
+
 transform_name = lambda name: name.split(' ')[0]
 
 df['Winner'] = df['Winner'].apply(transform_name)
@@ -22,19 +25,11 @@ def compute_elapsed(player, date):
     last = df_prevs['Date'].max()
     return np.absolute((date - last).days)
 
-final = df[[
-    'Winner',
-    'Loser',
-    'WRank',
-    'LRank',
-    'Court',
-    'Surface',
-    'Round',
-    'Series'
-]]
+
 
 with open(outfile, 'w') as f:
-    f.write('Winner, Loser, WRank, LRank, Court, Surface, Round, Series, WElapsed, LElapsed, WSets, LSets\n')
+    f.write('Winner, Loser, WRank, LRank, Court, Surface, Round, Series, WElapsed, LElapsed, ')
+    f.write('WRClay, WRGrass, WRHard, LRClay, LRGrass, LRHard, WAvgSpeed, LAvgSpeed, Wsets, Lsets\n')
     for entry in df.iterrows():
         row = entry[1]
         winner = row['Winner']
@@ -49,7 +44,7 @@ with open(outfile, 'w') as f:
         lsets = row['Lsets']
         welaps = compute_elapsed(winner, row['Date'])
         lelaps = compute_elapsed(loser, row['Date'])
-        f.write('%s, %s, %f, %f, %s, %s, %s, %s, %f, %f, %f, %f\n' % (
+        f.write('%s, %s, %f, %f, %s, %s, %s, %s, %f, %f, ' % (
             winner,
             loser,
             wrank,
@@ -59,7 +54,20 @@ with open(outfile, 'w') as f:
             rnd,
             series,
             welaps,
-            lelaps,
-            wsets,
-            lsets
+            lelaps
         ))
+        try:
+            f.write('%f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n' % (
+                df_ratio[df_ratio['Player'] == winner]['RClay'].values[0],
+                df_ratio[df_ratio['Player'] == winner]['RGrass'].values[0],
+                df_ratio[df_ratio['Player'] == winner]['RHard'].values[0],
+                df_ratio[df_ratio['Player'] == loser]['RClay'].values[0],
+                df_ratio[df_ratio['Player'] == loser]['RGrass'].values[0],
+                df_ratio[df_ratio['Player'] == loser]['RHard'].values[0],
+                df_service[df_service['Player'] == winner]['AvgSpeed'].values[0],
+                df_service[df_service['Player'] == loser]['AvgSpeed'].values[0],
+                wsets,
+                lsets
+            ))
+        except:
+            f.write('nan, nan, nan, nan, nan, nan, nan, nan, nan, nan\n')
