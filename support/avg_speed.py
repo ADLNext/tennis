@@ -54,6 +54,7 @@ def parse_name(full_name):
         return '$Token$'
 
 with open(outfile, 'w') as f:
+    f.wite('Player, AvgSpeed\n')
     for player in players:
         df_p1 = df_matches[df_matches['player1'] == player]
         df_speed_p1 = df_series[df_series['match_id'].isin(df_p1['match_id'])][['PointServer', 'Speed_KMH']]
