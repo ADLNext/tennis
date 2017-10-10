@@ -50,7 +50,7 @@ batch_size = 128
 display_step = 10
 
 # Network Parameters
-num_input = 16 # MNIST data input (img shape: 28*28)
+num_input = 16 # input, 4x4 matrix
 dropout = 0.75 # Dropout, probability to keep units
 num_outputs = 2 # digits composing the score we want to predict
 
