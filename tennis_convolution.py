@@ -80,8 +80,7 @@ def maxpool2d(x, k=2):
 
 # Create model
 def conv_net(x, weights, biases, dropout):
-    # Data input is a 1-D vector of 16 features (4x4 matrix)
-    # Reshape to match [Height x Width x Channel]
+    # Reshape to match picture format [Height x Width x Channel]
     # Tensor input become 4-D: [Batch Size, Height, Width, Channel]
     x = tf.reshape(x, shape=[-1, 4, 4, 1])
 
@@ -95,40 +94,34 @@ def conv_net(x, weights, biases, dropout):
     # Max Pooling (down-sampling)
     conv2 = maxpool2d(conv2, k=2)
 
-    # Convolution Layer
-    conv3 = conv2d(conv2, weights['wc3'], biases['bc3'])
-    # Max Pooling (down-sampling)
-    conv3 = maxpool2d(conv3, k=2)
-
     # Fully connected layer
-    # Reshape conv3 output to fit fully connected layer input
+    # Reshape conv2 output to fit fully connected layer input
     fc1 = tf.reshape(conv2, [-1, weights['wd1'].get_shape().as_list()[0]])
     fc1 = tf.add(tf.matmul(fc1, weights['wd1']), biases['bd1'])
     fc1 = tf.nn.relu(fc1)
     # Apply Dropout
     fc1 = tf.nn.dropout(fc1, dropout)
 
-    # Output, score prediction
+    # Output, class prediction
     out = tf.add(tf.matmul(fc1, weights['out']), biases['out'])
     return out
 
+
+# Store layers weight & bias
 weights = {
-    # 2x2 conv, 1 input, 4 outputs
-    'wc1': tf.Variable(tf.random_normal([2, 2, 1, 4])),
-    # 2x2 conv, 4 inputs, 8 outputs
-    'wc2': tf.Variable(tf.random_normal([2, 2, 4, 8])),
-    # 4x4 conv, 8 inputs, 64 outputs
-    'wc3': tf.Variable(tf.random_normal([4, 4, 8, 64])),
-    # fully connected, 8*8*64 inputs, 1024 outputs
-    'wd1': tf.Variable(tf.random_normal([8*8*16, 1024])),
-    # 1024 inputs, 2 outputs (score prediction)
+    # 5x5 conv, 1 input, 32 outputs
+    'wc1': tf.Variable(tf.random_normal([5, 5, 1, 32])),
+    # 5x5 conv, 32 inputs, 64 outputs
+    'wc2': tf.Variable(tf.random_normal([5, 5, 32, 64])),
+    # fully connected, 7*7*64 inputs, 1024 outputs
+    'wd1': tf.Variable(tf.random_normal([8*16*64, 1024])),
+    # 1024 inputs, 10 outputs (class prediction)
     'out': tf.Variable(tf.random_normal([1024, num_outputs]))
 }
 
 biases = {
-    'bc1': tf.Variable(tf.random_normal([4])),
-    'bc2': tf.Variable(tf.random_normal([8])),
-    'bc3': tf.Variable(tf.random_normal([64])),
+    'bc1': tf.Variable(tf.random_normal([32])),
+    'bc2': tf.Variable(tf.random_normal([64])),
     'bd1': tf.Variable(tf.random_normal([1024])),
     'out': tf.Variable(tf.random_normal([num_outputs]))
 }
@@ -136,7 +129,7 @@ biases = {
 logits = conv_net(X, weights, biases, keep_prob)
 
 # Mean squared error
-cost_op = tf.reduce_sum(tf.pow(logits-Y, 2))/(2*num_input)
+cost_op = tf.reduce_mean(tf.losses.mean_squared_error(Y, logits))
 
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 train_op = optimizer.minimize(cost_op)
