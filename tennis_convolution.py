@@ -13,4 +13,5 @@ Input matrix is a 4x4:
 Where Court, Surface, Round and Series are integers
 '''
 
-# soon...
+def prep_matrix(row):
+    
