@@ -29,7 +29,7 @@ def compute_elapsed(player, date):
 
 with open(outfile, 'w') as f:
     f.write('Winner, Loser, WRank, LRank, Court, Surface, Round, Series, WElapsed, LElapsed, ')
-    f.write('WRClay, WRGrass, WRHard, LRClay, LRGrass, LRHard, WAvgSpeed, LAvgSpeed, Wsets, Lsets\n')
+    f.write('WRClay, WRGrass, WRHard, LRClay, LRGrass, LRHard, WAvgSpeed, LAvgSpeed, Wsets, Lsets, WDigit, LDigit\n')
     for entry in df.iterrows():
         row = entry[1]
         winner = row['Winner']
@@ -57,7 +57,7 @@ with open(outfile, 'w') as f:
             lelaps
         ))
         try:
-            f.write('%f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n' % (
+            f.write('%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, 1, 0\n' % (
                 df_ratio[df_ratio['Player'] == winner]['RClay'].values[0],
                 df_ratio[df_ratio['Player'] == winner]['RGrass'].values[0],
                 df_ratio[df_ratio['Player'] == winner]['RHard'].values[0],
@@ -70,4 +70,4 @@ with open(outfile, 'w') as f:
                 lsets
             ))
         except:
-            f.write('nan, nan, nan, nan, nan, nan, nan, nan, nan, nan\n')
+            f.write('nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, 1, 0\n')
