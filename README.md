@@ -13,11 +13,13 @@ So far there is just a small study to predict a hypothetical Djokovic vs. Nadal 
 
 - `tennis_simulation.ipynb`: a notebook exploring the possibility of modeling a tennis game as a stochastic simulation; the dataset is the same used in the `tennis_p2p.ipynb` notebook. WIP.
 
+- `tennis_clf.py`: this script uses the data preprocessing from the CNN approach with multiple configurations of MLPs.
+
 ### CNN for score prediction
 
 This brave approach uses a Convolutional Neural Network to try and predict the scores of a tennis match.
 
 The folder `support` contains support scripts to preprocess data; these scripts can be useful for different approaches as well.
 
-The script `tennis_convolution.py` implements a CNN for regression in tensorflow, including loss function and optimizer.
-It's a work in progress and I haven't been able to properly test it because of the computing power required.
+The script `tennis_convolution.py` implements a CNN in tensorflow, including loss function and optimizer.
+It's a work in progress and I still need to go through the math for the convolution and pooling layers.
